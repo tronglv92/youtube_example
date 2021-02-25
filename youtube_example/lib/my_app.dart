@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:youtube_example/pages/detail_video/detail_video_page.dart';
+import 'package:youtube_example/pages/new_detail/new_detail_video_page.dart';
+import 'package:youtube_example/pages/test/draggable_card.dart';
+import 'package:youtube_example/pages/test/physics_animation.dart';
 import 'package:youtube_example/pages/videos/videos_page.dart';
 
 import 'modals/video.dart';
@@ -31,11 +34,44 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // OverlayEntry _overlayEntryVideo;
+  // final navkey = GlobalKey<NavigatorState>();
+
+
   @override
   void initState() {
     super.initState();
 
   }
+
+  // OverlayEntry createOverlayEntryVideo(Video video){
+  //   return OverlayEntry(builder: (BuildContext overlayContext){
+  //     return DetailVideoPage(video: video);
+  //   });
+  // }
+  //
+  // void showOverlayDetailVideo({@required Video video,@required bool show})
+  // {
+  //   if(show==true)
+  //     {
+  //       if(_overlayEntryVideo==null)
+  //       {
+  //         _overlayEntryVideo=createOverlayEntryVideo(video);
+  //       }
+  //       OverlayState overlay = navkey.currentState.overlay;
+  //       overlay.insert(_overlayEntryVideo);
+  //     }
+  //   else
+  //     {
+  //       if(_overlayEntryVideo!=null)
+  //         {
+  //           _overlayEntryVideo.remove();
+  //         }
+  //     }
+  //
+  // }
+  //
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +89,11 @@ class _MyAppState extends State<MyApp> {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: VideosPage(),
+      home: NewDetailVideoPage(video: videos[0],)
+
+      // NewDetailVideoPage(video: videos[0],),
     );
   }
+
+
 }

@@ -5,6 +5,7 @@ import 'icon_action.dart';
 
 class VideoContent extends StatelessWidget {
   final Video video;
+
   VideoContent({this.video});
   @override
   Widget build(BuildContext context) {
