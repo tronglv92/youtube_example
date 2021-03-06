@@ -68,7 +68,7 @@ List<Video> videos = [
       views: 63,
       published: DateTime.now().subtract(Duration(days: 10))),
   Video(
-      id: 3,
+      id: 2,
       thumbnail: 'assets/thumbnails/2.jpg',
       video: 'assets/2.mp4',
       title: 'PIXI.js in React Native for beginners',

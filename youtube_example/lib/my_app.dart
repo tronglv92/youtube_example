@@ -4,13 +4,19 @@ import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:youtube_example/pages/home/home_page.dart';
+import 'package:youtube_example/pages/home/home_provider.dart';
+
 import 'package:youtube_example/pages/detail_video/detail_video_page.dart';
-import 'package:youtube_example/pages/new_detail/new_detail_video_page.dart';
+import 'package:youtube_example/pages/home/video_provider.dart';
 import 'package:youtube_example/pages/test/draggable_card.dart';
 import 'package:youtube_example/pages/test/physics_animation.dart';
 import 'package:youtube_example/pages/videos/videos_page.dart';
 
 import 'modals/video.dart';
+import 'package:provider/provider.dart';
+
+import 'pages/test_page/video_player_app.dart';
 
 Future<void> myMain() async {
   /// Start services later
@@ -44,54 +50,33 @@ class _MyAppState extends State<MyApp> {
 
   }
 
-  // OverlayEntry createOverlayEntryVideo(Video video){
-  //   return OverlayEntry(builder: (BuildContext overlayContext){
-  //     return DetailVideoPage(video: video);
-  //   });
-  // }
-  //
-  // void showOverlayDetailVideo({@required Video video,@required bool show})
-  // {
-  //   if(show==true)
-  //     {
-  //       if(_overlayEntryVideo==null)
-  //       {
-  //         _overlayEntryVideo=createOverlayEntryVideo(video);
-  //       }
-  //       OverlayState overlay = navkey.currentState.overlay;
-  //       overlay.insert(_overlayEntryVideo);
-  //     }
-  //   else
-  //     {
-  //       if(_overlayEntryVideo!=null)
-  //         {
-  //           _overlayEntryVideo.remove();
-  //         }
-  //     }
-  //
-  // }
-  //
-
-
   @override
   Widget build(BuildContext context) {
 
 
     /// Build Material app
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (BuildContext context)=>HomeProvider()),
+        ChangeNotifierProvider<VideoProvider>(create: (_) => VideoProvider()),
+        // Provider(create: (BuildContext context) => VideoProvider(),)
+      ],
+      child: MaterialApp(
 
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
 
-        primarySwatch: Colors.blue,
-        backgroundColor: Colors.white,
+          primarySwatch: Colors.blue,
+          backgroundColor: Colors.white,
 
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+
+        home: HomePage()
+
+        // NewDetailVideoPage(video: videos[0],),
       ),
-      home: NewDetailVideoPage(video: videos[0],)
-
-      // NewDetailVideoPage(video: videos[0],),
     );
   }
 
