@@ -333,99 +333,96 @@ class _DetailVideoPageState extends State<DetailVideoPage>
       modeFullScreen = _chewieController.isFullScreen;
     }
 
-    return Stack(
-      children: [
-        Positioned(
-          top: drawComplete == true
-              ? toggleComplete == false
-                  ? toggleTranslationY
-                  : translationY
-              : size.height,
-          child: Material(
-            color: Colors.transparent,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onVerticalDragStart: (DragStartDetails detail) {
-                    if (modeFullScreen == false) {
-                      showChiewieController(false, _videoPlayerController);
-                    }
-                  },
-                  onVerticalDragDown: (DragDownDetails details) {
-                    if (modeFullScreen == false) {
-                      _controllerSpring?.stop();
-                    }
-                  },
-                  onVerticalDragUpdate: (DragUpdateDetails update) {
-                    if (modeFullScreen == false) {
-                      setTranslationY(translationY + update.delta.dy);
-                    }
-                  },
-                  onVerticalDragEnd: (DragEndDetails endDetail) {
-                    if (modeFullScreen == false) {
-                      if (translationY < (snapPoint - size.height / 4).abs()) {
-                        snapPoint = 0;
-                      } else {
-                        snapPoint = upperBound;
-                      }
+    return Positioned(
+      top: drawComplete == true
+          ? toggleComplete == false
+              ? toggleTranslationY
+              : translationY
+          : size.height,
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onVerticalDragStart: (DragStartDetails detail) {
+                if (modeFullScreen == false) {
+                  showChiewieController(false, _videoPlayerController);
+                }
+              },
+              onVerticalDragDown: (DragDownDetails details) {
+                if (modeFullScreen == false) {
+                  _controllerSpring?.stop();
+                }
+              },
+              onVerticalDragUpdate: (DragUpdateDetails update) {
+                if (modeFullScreen == false) {
+                  setTranslationY(translationY + update.delta.dy);
+                }
+              },
+              onVerticalDragEnd: (DragEndDetails endDetail) {
+                if (modeFullScreen == false) {
+                  if (translationY < (snapPoint - size.height / 4).abs()) {
+                    snapPoint = 0;
+                  } else {
+                    snapPoint = upperBound;
+                  }
 
-                      runAnimateSpring();
-                    }
-                  },
-                  onTap: () {
-                    if (modeFullScreen == false) {
-                      animateMoveToTop();
-                    }
-                  },
-                  child: Container(
-                    height: modeFullScreen == false ? videoHeight : size.height,
-                    width: size.width,
-                    color: Colors.white,
-                    child: Stack(
-                      children: [
-                        modeFullScreen == false
-                            ? VideoController(
-                                video: video,
-                                onPressClose: onPressCloseVideo,
-                                onPressPlay: onPressPlayVideo,
-                                opacity: opacityVideoContent,
-                              )
-                            : Container(),
-                        Container(
-                            width: modeFullScreen == false
-                                ? videoWidth
-                                : size.width,
-                            color: Colors.black,
-                            child: _videoPlayerController != null &&
-                                    _chewieController != null &&
-                                    _chewieController
-                                        .videoPlayerController.value.initialized
-                                ? Chewie(controller: _chewieController)
-                                : Center(
-                                    child: CircularProgressIndicator(),
-                                  )),
-                      ],
-                    ),
-                  ),
-                ),
-                modeFullScreen == false
-                    ? Container(
-                        width: size.width,
-                        height: videoContainerHeight,
-                        color: Colors.white,
-                        child: Opacity(
-                          opacity: opacity,
-                          child: VideoBody(
+                  runAnimateSpring();
+                }
+              },
+              onTap: () {
+                if (modeFullScreen == false) {
+                  animateMoveToTop();
+                }
+              },
+              child: Container(
+                height: modeFullScreen == false ? videoHeight : size.height,
+                width: size.width,
+                color: Colors.white,
+                child: Stack(
+                  children: [
+                    modeFullScreen == false
+                        ? VideoController(
                             video: video,
-                          ),
-                        ))
-                    : Container()
-              ],
+                            onPressClose: onPressCloseVideo,
+                            onPressPlay: onPressPlayVideo,
+                            opacity: opacityVideoContent,
+                          )
+                        : Container(),
+                    Container(
+                        width: modeFullScreen == false
+                            ? videoWidth
+                            : size.width,
+                        color: Colors.black,
+                        child: _videoPlayerController != null &&
+                                _chewieController != null &&
+                                _chewieController
+                                    .videoPlayerController.value.initialized
+                            ? Chewie(controller: _chewieController)
+                            : Center(
+                                child: CircularProgressIndicator(),
+                              )),
+                  ],
+                ),
+              ),
             ),
-          ),
+            modeFullScreen == false
+                ? Container(
+                    width: size.width,
+                    height: videoContainerHeight,
+                    color: Colors.white,
+                    child: Opacity(
+                      opacity: opacity,
+                      child: VideoBody(
+                        video: video,
+                      ),
+                    )
+            )
+                : Container()
+          ],
         ),
-      ],
+      ),
     );
   }
 }

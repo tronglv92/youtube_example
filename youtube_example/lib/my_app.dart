@@ -11,13 +11,13 @@ import 'package:youtube_example/pages/detail_video/detail_video_page.dart';
 import 'package:youtube_example/pages/home/video_provider.dart';
 import 'package:youtube_example/pages/test/draggable_card.dart';
 import 'package:youtube_example/pages/test/physics_animation.dart';
+
 import 'package:youtube_example/pages/videos/videos_page.dart';
 
 import 'modals/video.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/test_page/video_player_app.dart';
-
 Future<void> myMain() async {
   /// Start services later
   WidgetsFlutterBinding.ensureInitialized();

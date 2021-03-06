@@ -30,24 +30,40 @@ class _VideosPageState extends State<VideosPage> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     print("vao trong nay ");
     super.build(context);
-    return CustomScrollView(
-      slivers: [
+    return RotatedBox(
+      quarterTurns: 0,
+      child: OrientationBuilder(
+        builder: (BuildContext context,Orientation orientation)
+        {
+          if(orientation==Orientation.portrait)
+            {
+              return CustomScrollView(
+                slivers: [
 
-        SliverFixedExtentList(
-          delegate:
-              SliverChildBuilderDelegate((BuildContext context, int index) {
-            Video video = videos[index];
+                  SliverFixedExtentList(
+                    delegate:
+                    SliverChildBuilderDelegate((BuildContext context, int index) {
+                      Video video = videos[index];
 
-            return ItemVideo(
-              video: video,
-              onPress: () {
-                onPressItem(video);
-              },
-            );
-          }, childCount: videos.length),
-          itemExtent: 310,
-        )
-      ],
+                      return ItemVideo(
+                        video: video,
+                        onPress: () {
+                          onPressItem(video);
+                        },
+                      );
+                    }, childCount: videos.length),
+                    itemExtent:  310,
+                  )
+                ],
+              );
+            }
+          else
+            {
+              return Container();
+            }
+        },
+
+      ),
     );
   }
 
