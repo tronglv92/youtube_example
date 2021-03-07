@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:interpolate/interpolate.dart';
 import 'package:provider/provider.dart';
-import 'package:youtube_example/pages/home/home_provider.dart';
-import 'package:youtube_example/pages/home/bottom_tab/tab_item.dart';
+import 'package:youtube_example/pages/home_page/home_provider.dart';
+import 'package:youtube_example/pages/home_page/bottom_tab/tab_item.dart';
 
 const double HEIGHT_TAB = 55;
 
-class AnimatedBottomNavigationBar extends StatefulWidget {
+class BottomTab extends StatefulWidget {
   final ValueChanged<int> onChangeTabSelected;
 
-  AnimatedBottomNavigationBar({@required this.onChangeTabSelected});
+  BottomTab({@required this.onChangeTabSelected});
 
   @override
-  _AnimatedBottomNavigationBarState createState() =>
-      _AnimatedBottomNavigationBarState();
+  _BottomTabState createState() => _BottomTabState();
 }
 
-class _AnimatedBottomNavigationBarState
-    extends State<AnimatedBottomNavigationBar> {
+class _BottomTabState extends State<BottomTab> {
   int activeIndex;
   Interpolate ipTranslationYBottomBar;
   double upperBound = 0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -33,29 +32,21 @@ class _AnimatedBottomNavigationBarState
       initInterpolate(size);
     });
   }
+
   void initInterpolate(Size size) {
     ipTranslationYBottomBar = Interpolate(
         inputRange: [0, upperBound],
         outputRange: [HEIGHT_TAB, 0],
         extrapolate: Extrapolate.clamp);
-
-  }
-  @override
-  void didUpdateWidget(covariant AnimatedBottomNavigationBar oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-    // if (oldWidget.activeIndex != widget.activeIndex) {
-    //
-    // }
-    // print("didUpdateWidget oldWidget.activeIndex "+widget.activeIndex.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-
     int activeIndex = context.watch<HomeProvider>().currentIndexPage;
     double translationY = context.watch<HomeProvider>().translationY;
-    double translationYBottomTab=ipTranslationYBottomBar!=null?ipTranslationYBottomBar.eval(translationY):HEIGHT_TAB;
+    double translationYBottomTab = ipTranslationYBottomBar != null
+        ? ipTranslationYBottomBar.eval(translationY)
+        : HEIGHT_TAB;
     return Container(
       height: HEIGHT_TAB,
       child: Stack(
@@ -66,10 +57,16 @@ class _AnimatedBottomNavigationBarState
             width: MediaQuery.of(context).size.width,
             child: Container(
               // margin: EdgeInsets.only(top: 45),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                BoxShadow(
-                    color: Colors.black12, offset: Offset(0, -1), blurRadius: 8)
-              ]),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black12,
+                        offset: Offset(0, -1),
+                        blurRadius: 8)
+                  ],
+                  border: Border(
+                      top: BorderSide(width: 0.5, color: Colors.black12))),
               child: Row(
                 // mainAxisSize: MainAxisSize.max,
                 // crossAxisAlignment: CrossAxisAlignment.center,

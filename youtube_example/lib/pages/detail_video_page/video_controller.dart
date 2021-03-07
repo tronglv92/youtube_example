@@ -6,14 +6,15 @@ class VideoController extends StatefulWidget {
   final Function onPressPlay;
   final Function onPressClose;
   final double opacity;
-  VideoController({@required this.video,@required this.onPressPlay,@required this.onPressClose,this.opacity});
+  final bool play;
+  VideoController({@required this.video,@required this.onPressPlay,@required this.onPressClose,this.opacity,this.play=true});
 
   @override
   _VideoControllerState createState() => _VideoControllerState();
 }
 
 class _VideoControllerState extends State<VideoController> {
-  bool play=true;
+
 
 
   @override
@@ -45,11 +46,9 @@ class _VideoControllerState extends State<VideoController> {
                   ),
                 )),
             IconButton(
-                icon: Icon(play==true?Icons.pause:Icons.play_arrow), onPressed: () {
-                  setState(() {
-                    play=!play;
-                  });
-                  widget.onPressPlay(play);
+                icon: Icon(widget.play==true?Icons.pause:Icons.play_arrow), onPressed: () {
+
+                  widget.onPressPlay();
             }),
             IconButton(
                 icon: Icon(Icons.close), onPressed: () {

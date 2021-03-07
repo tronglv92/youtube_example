@@ -7,9 +7,10 @@ import 'package:interpolate/interpolate.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_example/modals/video.dart';
-import 'package:youtube_example/pages/detail_video/video_controller.dart';
-import 'package:youtube_example/pages/home/home_provider.dart';
-import 'package:youtube_example/pages/home/video_provider.dart';
+import 'package:youtube_example/pages/detail_video_page/video_controller.dart';
+import 'package:youtube_example/pages/home_page/bottom_tab/bottom_tab.dart';
+import 'package:youtube_example/pages/home_page/home_provider.dart';
+import 'package:youtube_example/pages/detail_video_page/video_provider.dart';
 import 'package:youtube_example/widgets/sweet_video/chewie_player.dart';
 
 import 'video_body.dart';
@@ -54,38 +55,35 @@ class _DetailVideoPageState extends State<DetailVideoPage>
 
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
-
-  // Video video;
-
-  // Chewie Video controller
+  bool isVideoPlay=true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // posY=widget.heightScreen;
 
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       drawComplete = true;
       final Size size = MediaQuery.of(context).size;
       midBound = size.height - 64 * 3;
-      upperBound = midBound + minHeight;
+      upperBound = midBound + minHeight+8;
 
       initInterpolate(size);
-      toggleUpAnimation(size);
+      slideUpAnimation(size);
     });
 
     initControllerAnimation();
-    // initializePlayer(videos[0]);
-    // video=context.read<VideoProvider>().video;
-    // initializePlayer(video);
-    WidgetsBinding.instance.addObserver(this);
   }
 
+  // ============= SETUP VIDEO ======================
+
   Future<void> initializePlayer(Video video) async {
-    print("initializePlayer video before " + video.id.toString());
+
     _videoPlayerController = VideoPlayerController.asset(video.video);
     await _videoPlayerController.initialize();
+    _videoPlayerController.addListener(onVideoListener);
+
     _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
@@ -94,61 +92,94 @@ class _DetailVideoPageState extends State<DetailVideoPage>
           DeviceOrientation.landscapeRight,
           DeviceOrientation.landscapeLeft,
         ]);
-    _chewieController.addListener(onListenerVideo);
-    print("initializePlayer video after " + video.id.toString());
+    _chewieController.addListener(onChewieListener);
+
     setState(() {});
   }
 
-  void onListenerVideo() {
+
+  void onVideoListener(){
+
+    if(_videoPlayerController!=null && _videoPlayerController?.value?.isPlaying!=isVideoPlay)
+      {
+
+        setState(() {
+          isVideoPlay=_videoPlayerController?.value?.isPlaying;
+        });
+      }
+
+  }
+
+  void onChewieListener() {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     if (_chewieController != null) {
+
+
+
       if (_chewieController.isFullScreen && isPortrait) {
         SystemChrome.setPreferredOrientations(
             [DeviceOrientation.landscapeRight]);
       } else if (!_chewieController.isFullScreen && !isPortrait) {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       }
+
     }
   }
 
-  void showChiewieController(
+  void showOrHideChiewieController(
       bool show, VideoPlayerController videoPlayerController) {
-    _restartChewieController(_videoPlayerController, () {
+    _restartChewieController(onComplete: () {
       if (_videoPlayerController != null) {
         setState(() {
           _chewieController = ChewieController(
               videoPlayerController: _videoPlayerController,
-              autoPlay: true,
+              autoPlay: isVideoPlay,
               showControls: show);
-          _chewieController.addListener(onListenerVideo);
+          _chewieController.addListener(onChewieListener);
         });
       }
     });
   }
 
-  Future<void> _preparePlayNextVideo(Video video, VoidCallback complete) async {
-    ChewieController _oldChewieController;
+  void _restartChewieController({VoidCallback onComplete}) {
     if (_chewieController != null) {
-      _oldChewieController = _chewieController;
-    }
+      final _oldChewieController = _chewieController;
+      _oldChewieController.removeListener(onChewieListener);
+      _oldChewieController?.dispose();
 
+      _chewieController = null;
+      if (onComplete != null) onComplete();
+    } else {
+      if (onComplete != null) onComplete();
+    }
+  }
+
+  Future<void> _preparePlayNextVideo(Video video, VoidCallback complete) async {
+    // _restartChewieController();
+    ChewieController _oldChewieController;
+    if(_chewieController!=null)
+      {
+           _oldChewieController = _chewieController;
+      }
     if (_videoPlayerController == null) {
       // If there was no controller, just create a new one
       complete();
     } else {
       // If there was a controller, we need to dispose of the old one first
       _videoPlayerController.pause();
-      final oldController = _videoPlayerController;
+      final oldVideoController = _videoPlayerController;
 
       // Registering a callback for the end of next frame
       // to dispose of an old controller
       // (which won't be used anymore after calling setState)
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        _oldChewieController.removeListener(onListenerVideo);
+        _oldChewieController?.removeListener(onChewieListener);
         _oldChewieController?.dispose();
-        await oldController?.dispose();
+
+        oldVideoController?.removeListener(onVideoListener);
+        await oldVideoController?.dispose();
         complete();
       });
 
@@ -159,21 +190,10 @@ class _DetailVideoPageState extends State<DetailVideoPage>
       });
     }
   }
+// ============= END SETUP VIDEO ======================
 
-  void _restartChewieController(
-      VideoPlayerController videoPlayerController, VoidCallback complete) {
-    if (_chewieController != null) {
-      final _oldChewieController = _chewieController;
-      _oldChewieController.removeListener(onListenerVideo);
-      _oldChewieController?.dispose();
 
-      _chewieController = null;
-      complete();
-    } else {
-      complete();
-    }
-  }
-
+  // =============  SETUP ANIMATION ======================
   void initControllerAnimation() {
     _controllerSpring =
         AnimationController(vsync: this, lowerBound: -500, upperBound: 500)
@@ -199,29 +219,12 @@ class _DetailVideoPageState extends State<DetailVideoPage>
           });
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-
-    if (video?.id != context.read<VideoProvider>().video?.id) {
-      Video newVideo = context.read<VideoProvider>().video;
-      if (firstBuild == false) {
-        animateMoveToTop();
-      }
-      _preparePlayNextVideo(newVideo, () {
-        initializePlayer(newVideo);
-      });
-
-      firstBuild = false;
-    }
-  }
 
   void animateMoveToTop() {
     // if small mode
     if (snapPoint != 0) {
       snapPoint = 0;
-      runAnimateSpring();
+      runAnimateSpring(begin: translationY,end: snapPoint);
     }
   }
 
@@ -257,7 +260,7 @@ class _DetailVideoPageState extends State<DetailVideoPage>
         extrapolate: Extrapolate.clamp);
   }
 
-  void toggleUpAnimation(Size size) {
+  void slideUpAnimation(Size size) {
     Tween<double> toggle = Tween<double>(begin: size.height, end: 0);
 
     Animation curve =
@@ -265,24 +268,11 @@ class _DetailVideoPageState extends State<DetailVideoPage>
     _animation = toggle.animate(curve);
     _controllerToggle.forward();
   }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-
-    _videoPlayerController?.dispose();
-    _chewieController?.dispose();
-    _controllerSpring?.dispose();
-    _controllerToggle?.dispose();
-
-    super.dispose();
-  }
-
-  runAnimateSpring() {
+  runAnimateSpring({double begin, double end}) {
     runSpringComplete = false;
 
     _animation =
-        _controllerSpring?.drive(Tween(begin: translationY, end: snapPoint));
+        _controllerSpring?.drive(Tween(begin: begin, end: end));
 
     const spring = SpringDescription(
       damping: 20,
@@ -294,43 +284,104 @@ class _DetailVideoPageState extends State<DetailVideoPage>
 
     _controllerSpring?.animateWith(simulation)?.whenCompleteOrCancel(() {
       if (snapPoint == 0) {
-        showChiewieController(true, _videoPlayerController);
+        showOrHideChiewieController(true, _videoPlayerController);
       }
     });
   }
+// =============  END SETUP ANIMATION ======================
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    Video newVideo = context.read<VideoProvider>().video;
+    if (video?.id != newVideo?.id) {
 
-  onPressCloseVideo() {
-    VideoProvider.hideDetailVideo(context: context);
+      // if (firstBuild == false) {
+      //
+      // }
+      isVideoPlay=true;
+      _preparePlayNextVideo(newVideo, () {
+        initializePlayer(newVideo);
+      });
+      //
+      // firstBuild = false;
+    }
+    print("didChangeDependencies");
+    animateMoveToTop();
+
   }
 
-  onPressPlayVideo(bool play) {
-    setState(() {});
+
+  disposeVideo()
+  {
+    _chewieController?.pause();
+    _videoPlayerController?.removeListener(onVideoListener);
+    _videoPlayerController?.dispose();
+
+    _chewieController?.removeListener(onChewieListener);
+    _chewieController?.dispose();
+    _controllerSpring?.dispose();
+    _controllerToggle?.dispose();
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    disposeVideo();
+    super.dispose();
+  }
+
+
+
+  onPressCloseVideo() {
+    _videoPlayerController?.removeListener(onVideoListener);
+    _chewieController?.removeListener(onChewieListener);
+    VideoProvider.hideDetailVideo(context: context);
+
+  }
+
+  onPressPlayVideo() {
+
+
+    setState(() {
+      isVideoPlay=!isVideoPlay;
+      if(isVideoPlay==true)
+      {
+        _chewieController?.play();
+      }
+      else
+
+      {
+        _chewieController?.pause();
+      }
+    });
+
+
+
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
-    double opacity = interOpacity != null ? interOpacity.eval(translationY) : 1;
-
-    double videoContainerHeight = ipVideoContainerHeight != null
-        ? ipVideoContainerHeight.eval(translationY)
-        : size.height;
-    double videoHeight = ipVideoHeight != null
-        ? ipVideoHeight.eval(translationY)
-        : (size.width / 1.78);
-    double videoWidth =
-        ipVideoWidth != null ? ipVideoWidth.eval(translationY) : size.width;
     video = context.watch<VideoProvider>().video;
 
-    double opacityVideoContent = ipOpacityVideoContent != null
+    final Size size = MediaQuery.of(context).size;
+    final double opacity =
+        interOpacity != null ? interOpacity.eval(translationY) : 1;
+    final double videoContainerHeight = ipVideoContainerHeight != null
+        ? ipVideoContainerHeight.eval(translationY)
+        : size.height;
+    final double videoHeight = ipVideoHeight != null
+        ? ipVideoHeight.eval(translationY)
+        : (size.width / 1.78);
+    final double videoWidth =
+        ipVideoWidth != null ? ipVideoWidth.eval(translationY) : size.width;
+    final double opacityVideoContent = ipOpacityVideoContent != null
         ? ipOpacityVideoContent.eval(translationY)
         : 1;
 
-    bool modeFullScreen = false;
-
+    bool modeVideoFullScreen = false;
     if (_chewieController != null) {
-      modeFullScreen = _chewieController.isFullScreen;
+      modeVideoFullScreen = _chewieController.isFullScreen;
     }
 
     return Positioned(
@@ -344,70 +395,42 @@ class _DetailVideoPageState extends State<DetailVideoPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onVerticalDragStart: (DragStartDetails detail) {
-                if (modeFullScreen == false) {
-                  showChiewieController(false, _videoPlayerController);
-                }
-              },
-              onVerticalDragDown: (DragDownDetails details) {
-                if (modeFullScreen == false) {
-                  _controllerSpring?.stop();
-                }
-              },
-              onVerticalDragUpdate: (DragUpdateDetails update) {
-                if (modeFullScreen == false) {
-                  setTranslationY(translationY + update.delta.dy);
-                }
-              },
-              onVerticalDragEnd: (DragEndDetails endDetail) {
-                if (modeFullScreen == false) {
-                  if (translationY < (snapPoint - size.height / 4).abs()) {
-                    snapPoint = 0;
-                  } else {
-                    snapPoint = upperBound;
-                  }
-
-                  runAnimateSpring();
-                }
-              },
-              onTap: () {
-                if (modeFullScreen == false) {
-                  animateMoveToTop();
-                }
-              },
-              child: Container(
-                height: modeFullScreen == false ? videoHeight : size.height,
-                width: size.width,
-                color: Colors.white,
-                child: Stack(
-                  children: [
-                    modeFullScreen == false
-                        ? VideoController(
-                            video: video,
-                            onPressClose: onPressCloseVideo,
-                            onPressPlay: onPressPlayVideo,
-                            opacity: opacityVideoContent,
-                          )
-                        : Container(),
-                    Container(
-                        width: modeFullScreen == false
-                            ? videoWidth
-                            : size.width,
-                        color: Colors.black,
-                        child: _videoPlayerController != null &&
-                                _chewieController != null &&
-                                _chewieController
-                                    .videoPlayerController.value.initialized
-                            ? Chewie(controller: _chewieController)
-                            : Center(
-                                child: CircularProgressIndicator(),
-                              )),
-                  ],
+            _onGestureVideo(
+                size: size,
+                child: Container(
+                  height:
+                      modeVideoFullScreen == false ? videoHeight : size.height,
+                  width: size.width,
+                  color: Colors.white,
+                  child: Stack(
+                    children: [
+                      modeVideoFullScreen == false
+                          ? VideoController(
+                              video: video,
+                              play: _chewieController?.isPlaying,
+                              onPressClose: onPressCloseVideo,
+                              onPressPlay: onPressPlayVideo,
+                              opacity: opacityVideoContent,
+                            )
+                          : Container(),
+                      Container(
+                          width: modeVideoFullScreen == false
+                              ? videoWidth
+                              : size.width,
+                          color: Colors.black,
+                          child: _videoPlayerController != null &&
+                                  _chewieController != null &&
+                                  _chewieController
+                                      .videoPlayerController.value.initialized
+                              ? Chewie(controller: _chewieController)
+                              : Center(
+                                  child: CircularProgressIndicator(),
+                                )),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            modeFullScreen == false
+                modeFullScreen: modeVideoFullScreen),
+            modeVideoFullScreen == false
                 ? Container(
                     width: size.width,
                     height: videoContainerHeight,
@@ -417,12 +440,52 @@ class _DetailVideoPageState extends State<DetailVideoPage>
                       child: VideoBody(
                         video: video,
                       ),
-                    )
-            )
+                    ))
                 : Container()
           ],
         ),
       ),
+    );
+  }
+
+  GestureDetector _onGestureVideo({
+    @required Widget child,
+    @required Size size,
+    bool modeFullScreen = false,
+  }) {
+    return GestureDetector(
+      onVerticalDragStart: (DragStartDetails detail) {
+        if (modeFullScreen == false) {
+          showOrHideChiewieController(false, _videoPlayerController);
+        }
+      },
+      onVerticalDragDown: (DragDownDetails details) {
+        if (modeFullScreen == false) {
+          _controllerSpring?.stop();
+        }
+      },
+      onVerticalDragUpdate: (DragUpdateDetails update) {
+        if (modeFullScreen == false) {
+          setTranslationY(translationY + update.delta.dy);
+        }
+      },
+      onVerticalDragEnd: (DragEndDetails endDetail) {
+        if (modeFullScreen == false) {
+          if (translationY < (snapPoint - size.height / 4).abs()) {
+            snapPoint = 0;
+          } else {
+            snapPoint = upperBound;
+          }
+
+          runAnimateSpring(begin: translationY,end: snapPoint);
+        }
+      },
+      onTap: () {
+        if (modeFullScreen == false) {
+          animateMoveToTop();
+        }
+      },
+      child: child,
     );
   }
 }

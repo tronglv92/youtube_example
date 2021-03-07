@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_example/modals/video.dart';
-import 'package:youtube_example/pages/detail_video/video_content.dart';
-import 'package:youtube_example/pages/videos/item_video.dart';
+import 'package:youtube_example/pages/detail_video_page/video_content.dart';
+import 'package:youtube_example/pages/videos_page/item_video.dart';
 class VideoBody extends StatelessWidget {
   final Video video;
   VideoBody({this.video});

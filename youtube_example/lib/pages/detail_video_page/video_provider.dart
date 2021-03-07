@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_example/modals/video.dart';
-import 'package:youtube_example/pages/detail_video/detail_video_page.dart';
-import 'package:youtube_example/pages/test_page/test_detail_video.dart';
+import 'package:youtube_example/pages/detail_video_page/detail_video_page.dart';
+
 
 
 class VideoProvider extends ChangeNotifier{

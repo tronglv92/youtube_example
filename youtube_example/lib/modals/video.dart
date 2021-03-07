@@ -85,31 +85,5 @@ List<Video> videos = [
       avatar: 'assets/avatars/1.png',
       views: 273,
       published: DateTime.now().subtract(Duration(days: 31))),
-  Video(
-      id: 4,
-      thumbnail: 'assets/thumbnails/4.jpg',
-      video: 'assets/1.mp4',
-      title: 'Permissions in React Native for absolute beginners',
-      username: 'Expo',
-      avatar: 'assets/avatars/1.png',
-      views: 273,
-      published: DateTime.now().subtract(Duration(days: 31))),
-  Video(
-      id: 4,
-      thumbnail: 'assets/thumbnails/4.jpg',
-      video: 'assets/1.mp4',
-      title: 'Permissions in React Native for absolute beginners',
-      username: 'Expo',
-      avatar: 'assets/avatars/1.png',
-      views: 273,
-      published: DateTime.now().subtract(Duration(days: 31))),
-  Video(
-      id: 4,
-      thumbnail: 'assets/thumbnails/4.jpg',
-      video: 'assets/1.mp4',
-      title: 'Permissions in React Native for absolute beginners',
-      username: 'Expo',
-      avatar: 'assets/avatars/1.png',
-      views: 273,
-      published: DateTime.now().subtract(Duration(days: 31))),
+
 ];
