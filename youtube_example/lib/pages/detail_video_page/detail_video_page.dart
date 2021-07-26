@@ -40,7 +40,7 @@ class _DetailVideoPageState extends State<DetailVideoPage>
 
   // double offsetY=0;
 
-  final double minHeight = 64;
+   double minHeight = 64;
   double midBound = 0;
   double upperBound = 0;
 
@@ -57,6 +57,8 @@ class _DetailVideoPageState extends State<DetailVideoPage>
   ChewieController _chewieController;
   bool isVideoPlay=true;
 
+
+  double paddingSafe=0;
   @override
   void initState() {
     // TODO: implement initState
@@ -66,9 +68,14 @@ class _DetailVideoPageState extends State<DetailVideoPage>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       drawComplete = true;
       final Size size = MediaQuery.of(context).size;
-      midBound = size.height - 64 * 3;
-      upperBound = midBound + minHeight+8;
+      paddingSafe=MediaQuery.of(context).padding.top+MediaQuery.of(context).padding.bottom;
+      midBound = size.height-paddingSafe  - 64 * 3;
+      minHeight=minHeight;
+      upperBound = midBound + minHeight+10;
 
+      print("midBound "+midBound.toString());
+      print("upperBound "+upperBound.toString());
+      print("minHeight "+minHeight.toString());
       initInterpolate(size);
       slideUpAnimation(size);
     });
@@ -390,59 +397,62 @@ class _DetailVideoPageState extends State<DetailVideoPage>
               ? toggleTranslationY
               : translationY
           : size.height,
-      child: Material(
-        color: Colors.transparent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _onGestureVideo(
-                size: size,
-                child: Container(
-                  height:
-                      modeVideoFullScreen == false ? videoHeight : size.height,
-                  width: size.width,
-                  color: Colors.white,
-                  child: Stack(
-                    children: [
-                      modeVideoFullScreen == false
-                          ? VideoController(
-                              video: video,
-                              play: _chewieController?.isPlaying,
-                              onPressClose: onPressCloseVideo,
-                              onPressPlay: onPressPlayVideo,
-                              opacity: opacityVideoContent,
-                            )
-                          : Container(),
-                      Container(
-                          width: modeVideoFullScreen == false
-                              ? videoWidth
-                              : size.width,
-                          color: Colors.black,
-                          child: _videoPlayerController != null &&
-                                  _chewieController != null &&
-                                  _chewieController
-                                      .videoPlayerController.value.initialized
-                              ? Chewie(controller: _chewieController)
-                              : Center(
-                                  child: CircularProgressIndicator(),
-                                )),
-                    ],
-                  ),
-                ),
-                modeFullScreen: modeVideoFullScreen),
-            modeVideoFullScreen == false
-                ? Container(
+
+      child: SafeArea(
+        child: Material(
+          color: Colors.transparent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _onGestureVideo(
+                  size: size,
+                  child: Container(
+                    height:
+                        modeVideoFullScreen == false ? videoHeight : size.height,
                     width: size.width,
-                    height: videoContainerHeight,
                     color: Colors.white,
-                    child: Opacity(
-                      opacity: opacity,
-                      child: VideoBody(
-                        video: video,
-                      ),
-                    ))
-                : Container()
-          ],
+                    child: Stack(
+                      children: [
+                        modeVideoFullScreen == false
+                            ? VideoController(
+                                video: video,
+                                play: _chewieController?.isPlaying,
+                                onPressClose: onPressCloseVideo,
+                                onPressPlay: onPressPlayVideo,
+                                opacity: opacityVideoContent,
+                              )
+                            : Container(),
+                        Container(
+                            width: modeVideoFullScreen == false
+                                ? videoWidth
+                                : size.width,
+                            color: Colors.black,
+                            child: _videoPlayerController != null &&
+                                    _chewieController != null &&
+                                    _chewieController
+                                        .videoPlayerController.value.initialized
+                                ? Chewie(controller: _chewieController)
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  )),
+                      ],
+                    ),
+                  ),
+                  modeFullScreen: modeVideoFullScreen),
+              modeVideoFullScreen == false
+                  ? Container(
+                      width: size.width,
+                      height: videoContainerHeight,
+                      color: Colors.white,
+                      child: Opacity(
+                        opacity: opacity,
+                        child: VideoBody(
+                          video: video,
+                        ),
+                      ))
+                  : Container()
+            ],
+          ),
         ),
       ),
     );

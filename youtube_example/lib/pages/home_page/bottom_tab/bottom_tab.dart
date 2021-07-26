@@ -47,83 +47,85 @@ class _BottomTabState extends State<BottomTab> {
     double translationYBottomTab = ipTranslationYBottomBar != null
         ? ipTranslationYBottomBar.eval(translationY)
         : HEIGHT_TAB;
-    return Container(
-      height: HEIGHT_TAB,
-      child: Stack(
-        children: [
-          Positioned(
-            top: translationYBottomTab,
-            height: HEIGHT_TAB,
-            width: MediaQuery.of(context).size.width,
-            child: Container(
-              // margin: EdgeInsets.only(top: 45),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        offset: Offset(0, -1),
-                        blurRadius: 8)
+    return SafeArea(
+      child: Container(
+        height: HEIGHT_TAB,
+        child: Stack(
+          children: [
+            Positioned(
+              top: translationYBottomTab,
+              height: HEIGHT_TAB,
+              width: MediaQuery.of(context).size.width,
+              child: Container(
+                // margin: EdgeInsets.only(top: 45),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0, -1),
+                          blurRadius: 8)
+                    ],
+                    border: Border(
+                        top: BorderSide(width: 0.5, color: Colors.black12))),
+                child: Row(
+                  // mainAxisSize: MainAxisSize.max,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    TabItem(
+                        selected: activeIndex == 0,
+                        iconDataOn: Icons.home,
+                        iconDataOff: Icons.home_outlined,
+                        title: "Home",
+                        callbackFunction: () {
+                          // setState(() {
+                          //   currentSelected = 0;
+                          // });
+                          widget.onChangeTabSelected(0);
+                        }),
+                    TabItem(
+                        selected: activeIndex == 1,
+                        iconDataOn: Icons.explore,
+                        iconDataOff: Icons.explore_outlined,
+                        title: "Explore",
+                        callbackFunction: () {
+                          // setState(() {
+                          //   currentSelected = 1;
+                          // });
+                          widget.onChangeTabSelected(1);
+                        }),
+                    TabItem(
+                        iconDataOn: Icons.add_circle_outline,
+                        middle: true,
+                        callbackFunction: () {}),
+                    TabItem(
+                        selected: activeIndex == 2,
+                        iconDataOn: Icons.video_call,
+                        iconDataOff: Icons.video_call_outlined,
+                        title: "Register",
+                        callbackFunction: () {
+                          // setState(() {
+                          //   currentSelected = 2;
+                          // });
+                          widget.onChangeTabSelected(2);
+                        }),
+                    TabItem(
+                        selected: activeIndex == 3,
+                        iconDataOn: Icons.video_library,
+                        iconDataOff: Icons.video_library_outlined,
+                        title: "Library",
+                        callbackFunction: () {
+                          // setState(() {
+                          //   currentSelected = 3;
+                          // });
+                          widget.onChangeTabSelected(3);
+                        })
                   ],
-                  border: Border(
-                      top: BorderSide(width: 0.5, color: Colors.black12))),
-              child: Row(
-                // mainAxisSize: MainAxisSize.max,
-                // crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  TabItem(
-                      selected: activeIndex == 0,
-                      iconDataOn: Icons.home,
-                      iconDataOff: Icons.home_outlined,
-                      title: "Home",
-                      callbackFunction: () {
-                        // setState(() {
-                        //   currentSelected = 0;
-                        // });
-                        widget.onChangeTabSelected(0);
-                      }),
-                  TabItem(
-                      selected: activeIndex == 1,
-                      iconDataOn: Icons.explore,
-                      iconDataOff: Icons.explore_outlined,
-                      title: "Explore",
-                      callbackFunction: () {
-                        // setState(() {
-                        //   currentSelected = 1;
-                        // });
-                        widget.onChangeTabSelected(1);
-                      }),
-                  TabItem(
-                      iconDataOn: Icons.add_circle_outline,
-                      middle: true,
-                      callbackFunction: () {}),
-                  TabItem(
-                      selected: activeIndex == 2,
-                      iconDataOn: Icons.video_call,
-                      iconDataOff: Icons.video_call_outlined,
-                      title: "Register",
-                      callbackFunction: () {
-                        // setState(() {
-                        //   currentSelected = 2;
-                        // });
-                        widget.onChangeTabSelected(2);
-                      }),
-                  TabItem(
-                      selected: activeIndex == 3,
-                      iconDataOn: Icons.video_library,
-                      iconDataOff: Icons.video_library_outlined,
-                      title: "Library",
-                      callbackFunction: () {
-                        // setState(() {
-                        //   currentSelected = 3;
-                        // });
-                        widget.onChangeTabSelected(3);
-                      })
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
